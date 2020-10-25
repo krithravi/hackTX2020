@@ -4,7 +4,8 @@ class Inputs extends Component {
     state = {
         username: '',
         password: '',
-        logopt: ''
+        logopt: '',
+        token: ''
     }
 
     UserName = (x) => {
@@ -14,12 +15,13 @@ class Inputs extends Component {
         this.setState({ password: x })
     }
 
-    login = (user, pass) => {
+    async login (user, pass) {
+        var temp = ' ';
         var vU = this.validUserName(user);
         var vP = this.validPassWord(pass);
         if (vU && vP) {
             if (this.state.logopt == "register") {
-                fetch("http://hacktx2020.southcentralus.cloudapp.azure.com:8080/api/signin", { 
+                var meep = await fetch("http://hacktx2020.southcentralus.cloudapp.azure.com:8080/api/register", { 
         
                     // Adding method type 
                     method: "POST", 
@@ -32,12 +34,24 @@ class Inputs extends Component {
                     
                     // Adding headers to the request 
                     headers: { 
-                        "Content-type": "application/json; charset=UTF-8"
+                        "Content-Type": "application/json; charset=UTF-8"
                     } 
                 })
+
+                //meep.json() // WORKED!!! eureka
+                //.then(data => console.log(data["token"])); // WORKED!!! eureka
+                var data = await meep.json();
+                //console.log("hi" + meep.status); // previously useful 
+                if (meep.status != 200) {
+                    alert("Error, try again! :)");
+                }
+                else {
+                    this.state.token = data["token"];
+                    //console.log(this.state.token);
+                }
             }
             else if (this.state.logopt == "signin") {
-                fetch("http://hacktx2020.southcentralus.cloudapp.azure.com:8080/api/login", { 
+                var meep = await fetch("http://hacktx2020.southcentralus.cloudapp.azure.com:8080/api/login", { 
         
                     // Adding method type 
                     method: "POST", 
@@ -50,13 +64,20 @@ class Inputs extends Component {
                     
                     // Adding headers to the request 
                     headers: { 
-                        "Content-type": "application/json; charset=UTF-8"
+                        "Content-Type": "application/json; charset=UTF-8"
                     } 
                 })
+
+                var data = await meep.json();
+                if (meep.status != 200) {
+                    alert("Error, try again! :)");
+                }
+                else {
+                    this.state.token = data["token"];
+                    console.log(this.state.token);
+                }
             }
         }
-
-
     }
 
     handleChange=(e)=>{
@@ -107,11 +128,11 @@ class Inputs extends Component {
                 <form>
                     <input type="radio" value="register" id="reg"
                     onChange={this.handleChange} name="logopt" />            
-                    <label for="reg">Register!</label>
+                    <label>Register!</label>
 
                     <input type="radio" value="signin" id="sig"
                     onChange={this.handleChange} name="logopt"/>            
-                    <label for="sig">Sign In!</label>
+                    <label>Sign In!</label>
                 </form>
 
                 <p>You are going to: {this.state.logopt}</p>
