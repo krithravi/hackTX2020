@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Switch } from 'react-native';
 import SwitchToggle from "react-native-switch-toggle";
 import '../style.css';
-import CheckBox from 'react-native-check-box'
 import Report from './Report'
+import Profile from './Profile'
 
 class Inputs extends Component {
     state = {
@@ -14,9 +14,11 @@ class Inputs extends Component {
         reportInt: '',
         int: '',
         zipcode: '',
-
+        points: 0,
+        streak: 0,
+        hideLog: "block",
         hideRep: "none",
-        hideProf: "none"
+        temp: ' '
     }
 
     UserName = (x) => {
@@ -25,6 +27,52 @@ class Inputs extends Component {
     PassWord = (x) => {
         this.setState({ password: x })
     }
+
+    SetTemp = (x) => {
+        this.setState({ temp: x })
+    }
+
+    SetPoints = (x) => {
+        this.setState({ points: x })
+    }
+
+    SetStreak = (x) => {
+        this.setState({ streak: x })
+    }
+
+    async checkNewPass (x) {
+        // if it's valid, set it
+        // give it over to database
+        // tell the user it's ok
+        if (this.validPassWord(x)) {
+            this.PassWord(x);
+            var meep = await fetch("http://hacktx2020.southcentralus.cloudapp.azure.com:8080/api/reset-password", { 
+                method: "POST", 
+                body: JSON.stringify({ 
+                    username: this.state.username, 
+                    newpassword: this.state.password,
+                }), 
+                headers: { 
+                    "Content-Type": "application/json; charset=UTF-8",
+                    "Authorization": "Bearer " + this.state.token
+                } 
+            })
+
+            var data = await meep.json();
+            if (meep.status != 200) {
+                alert("Error, try again! :)");
+            }
+            else {
+                alert("Submitted!");
+            }
+        }
+        else {
+            alert("Attempt failed.");
+        }
+    }
+
+
+
     ZipCode = (x) => {
         this.setState({ zipcode: x })
     }
@@ -58,9 +106,22 @@ class Inputs extends Component {
                     // take me to the next place!
                     document.getElementById("report").style.display = "block";
                     this.state.hideRep = "block";
+                    this.state.hideLog = "none";
                 }
             }
             else if (this.state.logopt == "signin") {
+                var leep = await fetch("http://hacktx2020.southcentralus.cloudapp.azure.com:8080/api/points/" + user)
+                var egg = await leep.json();
+
+                egg = egg["points"];
+                console.log(egg);
+                this.state.points = egg;
+
+                var zeep = await fetch("http://hacktx2020.southcentralus.cloudapp.azure.com:8080/api/streak/" + user)
+                egg = await zeep.json();
+                egg = egg["streak"];
+                this.state.streak = egg;
+
                 var meep = await fetch("http://hacktx2020.southcentralus.cloudapp.azure.com:8080/api/login", { 
                     method: "POST", 
                     body: JSON.stringify({ 
@@ -84,6 +145,7 @@ class Inputs extends Component {
                     //this.state.hideRep = "show";
                     document.getElementById("report").style.display = "block";
                     this.state.hideRep = "block";
+                    this.state.hideLog = "none";
                 }
             }
         }
@@ -134,6 +196,7 @@ class Inputs extends Component {
         }
         return true;
     }
+
   
     async counter () {
         // temp is now a nodelist
@@ -154,31 +217,31 @@ class Inputs extends Component {
                 body: JSON.stringify({ 
                     username: this.state.username, 
                     zipcode: this.state.zipcode,
-                    symptoms: this.state.int
+                    symptoms: parseInt(this.state.int, 2)
                 }), 
                 headers: { 
                     "Content-Type": "application/json; charset=UTF-8",
-                    "Authorization": "Bearer <auth token>"
+                    "Authorization": "Bearer " + this.state.token
                 } 
             })
 
-
-            await meep.json();
+            var data = await meep.json();
             if (meep.status != 200) {
                 alert("Error, try again! :)");
             }
             else {
+                this.state.token = data["token"];
                 alert("Submitted!");
-                // link me to a map
             }
         }
     }
+
 
     render() {
         
         return (
             <View style = {styles.container}>
-                <div id="log">
+                <div id="log" style={{display: this.state.hideLog}}>
                     <h1>
                         Welcome!
                     </h1>
@@ -230,15 +293,33 @@ class Inputs extends Component {
                     >
                         <Text style = {styles.submitButtonText}> I'm done </Text>
                     </TouchableOpacity>
+                    <h1>
+                        Your User Information
+                    </h1>
+                    Username: {this.state.username}
+                    <br></br>
+                    Points: {this.state.points}
+                    <br></br>
+                    Streak: {this.state.streak} 
+
+                    <br></br>
+                    Change password: 
+                    <TextInput style = {styles.input}
+                        secureTextEntry={true}
+                        placeholder = "Password"
+                        autoCapitalize = "none"
+                        onChangeText = {this.SetTemp}
+                    />
                     <TouchableOpacity
                         style = {styles.submitButton}
                         className = "button"
                         onPress = {
-                            () => this.counter()
+                            () => this.checkNewPass(this.state.temp)
                         }
                     >
-                        <Text style = {styles.submitButtonText}> I'm done </Text>
+                        <Text style = {styles.submitButtonText}> Change password </Text>
                     </TouchableOpacity>
+
                 </div>
             </View>
         )
