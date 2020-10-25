@@ -8,10 +8,6 @@ import Inputs from './components/Inputs'
 export default function App() {
   return (
       <View style={styles.container}>
-        <h1>
-          Welcome!
-        </h1>
-
         <Inputs />
         <StatusBar style="auto" />
       </View>
