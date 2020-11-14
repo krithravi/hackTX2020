@@ -14,8 +14,8 @@ class Inputs extends Component {
         reportInt: '',
         int: '',
         zipcode: '',
-        points: 0,
-        streak: 0,
+        points: '',
+        streak: '',
         hideLog: "block",
         hideRep: "none",
         temp: ' '
@@ -32,13 +32,6 @@ class Inputs extends Component {
         this.setState({ temp: x })
     }
 
-    SetPoints = (x) => {
-        this.setState({ points: x })
-    }
-
-    SetStreak = (x) => {
-        this.setState({ streak: x })
-    }
 
     async checkNewPass (x) {
         // if it's valid, set it
@@ -301,7 +294,7 @@ class Inputs extends Component {
                     Points: {this.state.points}
                     <br></br>
                     Streak: {this.state.streak} 
-
+                    {console.log(this.state.points + " " + this.state.streak)}
                     <br></br>
                     Change password: 
                     <TextInput style = {styles.input}

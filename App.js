@@ -3,19 +3,25 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import './style.css';
 
-import Inputs from './components/Inputs'
+import Login from './components/Login'
+
+
+var state = {
+    token: ''
+}
+
 
 export default function App() {
-  return (
-      <View style={styles.container}>
-        <Inputs />
+    return (
+        <View style={styles.container}>
+        <Login />
         <StatusBar style="auto" />
-      </View>
-  );
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
+    container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

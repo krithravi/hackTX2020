@@ -15,6 +15,11 @@ h1 {
     text-align: center;
 }
 
+input {
+    padding: 8px;
+    border-radius: 7px;
+}
+
 .switch {
     position: relative;
     display: inline-block;
